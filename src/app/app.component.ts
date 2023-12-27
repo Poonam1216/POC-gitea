@@ -17,7 +17,7 @@ export class AppComponent {
   constructor(private giteaService: GiteaService) {}
   createRepository(): void {
     this.giteaService.createRepository(this.repoName).subscribe({
-      next: (response) => {
+      next: (_response) => {
         this.createdRepoMessage = `Repository "${this.repoName}" created successfully!`;
       },
       error: (error) => {

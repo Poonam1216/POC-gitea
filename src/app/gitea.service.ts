@@ -29,7 +29,7 @@ private apiUrl ='http://localhost:3000/api/v1';
     console.log('Request URL:', url);
     console.log('Request Payload:', payload);
   
-    return this.http.post(url, payload);
+    return this.http.post(url, payload, { headers: this.getHeaders() });
   }
   
 }
