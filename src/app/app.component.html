@@ -27,6 +27,23 @@
   </div>
 </div> -->
 
+<!-- <div>
+  <h2>Create a Branch</h2>
+
+  <label for="userName">User Name:</label>
+  <input [(ngModel)]="username" id="userName" placeholder="Enter user name" />
+
+  <label for="repoName">Repository Name:</label>
+  <input [(ngModel)]="repoName" id="repoName" placeholder="Enter repository name" />
+
+  <label for="oldBranchName">Old Branch Name:</label>
+  <input [(ngModel)]="oldBranchName" id="oldBranchName" placeholder="Enter old branch name" />
+
+  <label for="newBranchName">New Branch Name:</label>
+  <input [(ngModel)]="newBranchName" id="newBranchName" placeholder="Enter new branch name" />
+
+  <button (click)="createBranch()">Create Branch</button>
+</div> -->
 
 <div>
   <h2>Fetch all Branches</h2>
@@ -34,36 +51,74 @@
   <input [(ngModel)]="username" id="userName" placeholder="Enter repository name" />
   <label for="repoName">Repository Name:</label>
   <input [(ngModel)]="repoName" id="repoName" placeholder="Enter repository name" />
-  <button (click)="fetchBranch()">fetch</button>
+  <button (click)="fetchBranch()">Fetch Branches</button>
 
   <div *ngIf="allBranches && allBranches.length > 0">
     <p>Branches:</p>
     <ul>
       <li *ngFor="let branch of allBranches">
         <span>{{ branch.name }}</span>
-        <div *ngFor="let file of allFiles">
-          <p (click)="DiveIn(file)">{{ file.name }}</p>
-        </div>
         <button (click)="fetchBranchDetails(branch.name)">Fetch Details</button>
+        <div *ngIf="branchDetails && branchDetails.name === branch.name">
+          <!-- Display other branch details as needed -->
+
+          <h3>Files in {{ branchDetails.name }} branch:</h3>
+          <ul>
+            <li *ngFor="let file of branchFiles">
+              <p (click)="DiveIn(file)">{{ file.name }}</p>
+            </li>
+          </ul>
+        </div>
       </li>
     </ul>
   </div>
-  <div *ngIf="branchDetails">
-    <!-- Display other branch details as needed -->
+</div>
 
-    <h3>Files in {{ branchDetails.name }} branch:</h3>
+<div>
+  <h2>Fetch Commit History</h2>
+  <label for="username">Owner:</label>
+  <input [(ngModel)]="username" id="username" placeholder="Enter owner" />
+  <label for="repoName">Repository:</label>
+  <input [(ngModel)]="repoName" id="repoName" placeholder="Enter repository" />
+  <button (click)="fetchCommitHistory()">Fetch Commit History</button>
+
+  <div *ngIf="commitHistory && commitHistory.length > 0">
+    <h3>Commit History:</h3>
     <ul>
-      <li *ngFor="let file of branchFiles">
-        <p (click)="DiveIn(file)">{{ file.name }}</p>
+      <li *ngFor="let commit of commitHistory">
+        <p>commit sha: {{ commit.sha }} - commit meesage: {{ commit.commit.message }}</p>
       </li>
     </ul>
+  </div>
+</div>
+
+<div>
+  <h2>Fetch Commit Details</h2>
+  <label for="username">Owner:</label>
+  <input [(ngModel)]="username" id="username" placeholder="Enter username" />
+  <label for="repoName">Repository:</label>
+  <input [(ngModel)]="repoName" id="repoName" placeholder="Enter repository" />
+  <label for="commitHash">Commit Hash:</label>
+  <input [(ngModel)]="commitHash" id="commitHash" placeholder="Enter commit hash" />
+  <button (click)="fetchCommitDetails()">Fetch Commit Details</button>
+
+  <div *ngIf="commitDetails">
+    <h3>Changed Files:</h3>
+    <ul *ngIf="commitDetails.files && commitDetails.files.length > 0; else noFiles">
+      <li *ngFor="let file of commitDetails.files">
+        <p>{{ file.filename }}</p>
+      </li>
+    </ul>
+    <ng-template #noFiles>
+      <p>No files changed in this commit.</p>
+    </ng-template>
   </div>
 </div>
 
 
 
 
-<div>
+<!-- <div>
   <h2>Update files</h2>
   <label for="userfetch">username:</label>
   <input [(ngModel)]="username" id="userupdate" placeholder="Enter UserName" />
@@ -77,7 +132,7 @@
   <div *ngIf="updateFileName">
     <p>Updated File Name: {{ updateFileName }}</p>
   </div>
-</div>
+</div> -->
 
 <!-- just to reflect new banch -->
 <!-- 

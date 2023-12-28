@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -11,7 +11,7 @@ import { Observable } from 'rxjs';
 //   private apiUrl = 'http://localhost:3000/api/v1';
 private apiUrl ='http://localhost:3000/api/v1';
   private username = 'poonamgaian';
-  private password = '96659cbb8e0f7ecce6f67c843c9304427dc9af05';
+  private password = '66fb170d73916344855cf3c43be55d799265b762';
 
 
   constructor(private http: HttpClient) {}
@@ -92,6 +92,34 @@ private apiUrl ='http://localhost:3000/api/v1';
   getBranchFiles(username: string, repo: string, branch: string, path: string = ''): Observable<any> {
     const fullPath = path ? `/${path}` : '';
     const url = `${this.apiUrl}/repos/${username}/${repo}/contents${fullPath}?ref=${branch}`;
+    return this.http.get(url, { headers: this.getHeaders() });
+  }
+
+  createBranch(username: string, repo: string, newBranchName: string, oldBranchName:string): Observable<any> {
+    const url = `${this.apiUrl}/repos/${username}/${repo}/branches`;
+    const body = { new_branch_name: newBranchName, old_branch_name: oldBranchName }; 
+  
+    return this.http.post(url, body, { headers: this.getHeaders() });
+  }
+
+
+
+
+  getCommitHistory(username: string, repo: string, sha: string = 'master'): Observable<any> {
+    const url = `${this.apiUrl}/repos/${this.username}/${repo}/commits`;
+    
+    // You can customize the parameters based on your needs
+    const params = new HttpParams()
+      .set('sha', sha)
+      .set('stat', 'true')
+      .set('verification', 'true')
+      .set('files', 'true');
+
+    return this.http.get(url, { params: params, headers: this.getHeaders() });
+  }
+
+  getCommitDetails(username: string, repo: string, sha: string): Observable<any> {
+    const url = `${this.apiUrl}/repos/${username}/${repo}/commit/${sha}`;
     return this.http.get(url, { headers: this.getHeaders() });
   }
 }

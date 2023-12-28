@@ -24,6 +24,12 @@ export class AppComponent {
   branch: any;
   branchDetails: any;
   branchFiles: any;
+  newBranchName: any;
+  createBranchMessage: any;
+  oldBranchName: any;
+  commitHistory: any;
+  commitHash: any;
+  commitDetails: any;
 
 
 
@@ -99,20 +105,53 @@ export class AppComponent {
     });
   }
 
-  // fetchBranchDetails(branchName: string): void {
-  //   // if (!this.branch) {
-  //   //   console.error('Branch name is undefined.');
-  //   //   return;
-  //   // }
-  //   this.giteaService.getBranchDetails(this.username, this.repoName, branchName).subscribe({
-  //     next: (branchDetails: any) => {
-  //       console.log('Branch details:', branchDetails);
-  //     },
-  //     error: (error: any) => {
-  //       console.error(`Error fetching details for branch '${branchName}':`, error);
-  //     }
-  //   });
-  // }
+  createBranch(): void {
+    if (!this.newBranchName || !this.username || !this.repoName) {
+      console.error('Username, repository name, and new branch name are required.');
+      return;
+    }
+  
+    this.giteaService.createBranch(this.username, this.repoName, this.newBranchName, this.oldBranchName).subscribe({
+      next: (_response) => {
+        this.createBranchMessage = `Branch "${this.newBranchName}" created successfully!`;
+      },
+      error: (error) => {
+        console.error('Error creating branch:', error);
+        this.createBranchMessage = 'Error creating branch. Check the console for details.';
+      }
+    });
+  }
+  
+  fetchCommitHistory() {
+    this.giteaService.getCommitHistory(this.username, this.repoName).subscribe({
+      next: (commits) => {
+        this.commitHistory = commits;
+        console.log('Commit History:', commits);
+      },
+      error: (error) => {
+        console.error('Error fetching commit history:', error);
+      }
+    });
+  }
+
+  fetchCommitDetails(): void {
+    if (!this.username || !this.repoName || !this.commitHash) {
+      console.error('Username, repository name, and commit hash are required.');
+      return;
+    }
+  
+    this.giteaService.getCommitDetails(this.username, this.repoName, this.commitHash).subscribe({
+      next: (commitDetails: any) => {
+        console.log('Commit details:', commitDetails);
+        this.commitDetails = commitDetails;
+      },
+      error: (error: any) => {
+        console.error('Error fetching commit details:', error);
+        // Handle the error as needed, e.g., show an error message.
+      }
+    });
+  }
+  
 
   DiveIn(file: any): void {
     if (file.type === 'file') {
