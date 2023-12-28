@@ -5,3 +5,73 @@
   <button (click)="createRepository()">Create Repository</button>
   <p>{{ createdRepoMessage }}</p>
 </div>
+
+<div>
+  <h2>Fetch all Repos</h2>
+  <label for="userNameFetch">User Name:</label>
+  <input [(ngModel)]="username" id="userNameFetch" placeholder="Enter repository name" />
+  <button (click)="fetchAllRepos()">fetch</button>
+  <p>{{ allRepos.toString() }}</p>
+</div>
+
+
+<div>
+  <h2>Fetch all files</h2>
+  <label for="userfetch">username:</label>
+  <input [(ngModel)]="username" id="userfetch" placeholder="Enter UserName" />
+  <label for="repoName">Repository Name:</label>
+  <input [(ngModel)]="repoName" id="repoName" placeholder="Enter repository name" />
+  <button (click)="fetchAllFiles()">fetch</button>
+  <div *ngFor="let file of allFiles">
+    <p (click)="DiveIn(file)">{{ file.name }}</p>
+  </div>
+</div>
+
+
+<div>
+  <h2>Fetch all Branches</h2>
+  <label for="userName">User Name:</label>
+  <input [(ngModel)]="username" id="userName" placeholder="Enter repository name" />
+  <label for="repoName">Repository Name:</label>
+  <input [(ngModel)]="repoName" id="repoName" placeholder="Enter repository name" />
+  <button (click)="fetchBranch()">fetch</button>
+  <p *ngFor="let branch of allBranches">{{ branch.name }}</p>
+</div>
+
+
+
+
+<div>
+  <h2>Update files</h2>
+  <label for="userfetch">username:</label>
+  <input [(ngModel)]="username" id="userupdate" placeholder="Enter UserName" />
+  <label for="repoName">Repository Name:</label>
+  <input [(ngModel)]="repoName" id="repoName" placeholder="Enter repository name" />
+  <label for="updFileCont">Content:</label>
+  <textarea id="updFileCont" [(ngModel)]="fileContent"></textarea><br />
+  <label for="updFileCont">File Name</label>
+  <input [(ngModel)]="fileName" id="FileName" type="text" placeholder="Enter File Name" />
+  <button (click)="updateFiles()">Update</button>
+  <div *ngIf="updateFileName">
+    <p>Updated File Name: {{ updateFileName }}</p>
+  </div>
+</div>
+
+<!-- 
+<h2>Repository List</h2>
+<ul *ngIf="allRepos && allRepos.length > 0">
+  <li *ngFor="let repo of allRepos">
+    {{ repo.name }}
+    <button (click)="fetchBranches(repo.name)">Fetch Branches</button>
+    <ul *ngIf="repo.branches && repo.branches.length > 0">
+      <li *ngFor="let branch of repo.branches">
+        {{ branch.name }}
+      </li>
+    </ul>
+  </li>
+</ul>
+<div *ngIf="!allRepos || allRepos.length === 0">
+  <p>No repositories found.</p>
+</div>
+<div *ngIf="loading">
+  <p>Loading...</p> -->
