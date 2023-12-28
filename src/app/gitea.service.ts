@@ -12,7 +12,6 @@ import { Observable } from 'rxjs';
 private apiUrl ='http://localhost:3000/api/v1';
   private username = 'poonamgaian';
   private password = '96659cbb8e0f7ecce6f67c843c9304427dc9af05';
-  getBranchDetails: any;
 
 
   constructor(private http: HttpClient) {}
@@ -83,5 +82,16 @@ private apiUrl ='http://localhost:3000/api/v1';
   getBranch(owner: string, repo: string): Observable<any> {
     const url = `${this.apiUrl}/repos/${owner}/${repo}/branches`;
     return this.http.get<any>(url);
+  }
+
+  getBranchDetails(username: string, repo: string, branch: string): Observable<any> {
+    const url = `${this.apiUrl}/repos/${username}/${repo}/branches/${branch}`;
+    return this.http.get(url, { headers: this.getHeaders() });
+  }
+
+  getBranchFiles(username: string, repo: string, branch: string, path: string = ''): Observable<any> {
+    const fullPath = path ? `/${path}` : '';
+    const url = `${this.apiUrl}/repos/${username}/${repo}/contents${fullPath}?ref=${branch}`;
+    return this.http.get(url, { headers: this.getHeaders() });
   }
 }

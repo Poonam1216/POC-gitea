@@ -22,6 +22,8 @@ export class AppComponent {
   updateFileName: string = '';
   allBranches: any;
   branch: any;
+  branchDetails: any;
+  branchFiles: any;
 
 
 
@@ -60,17 +62,6 @@ export class AppComponent {
       }
     })
   }
-
-  // fetchBranch(){
-  //   this.giteaService.getBranch(this.username, this.repoName, this.branch).subscribe({
-  //     next:(response)=> {
-  //       this.allBranches = response;
-  //       console.log(response);
-  //   },
-  //   error:(err)=>{
-  //     alert("No Branch Found")  
-  //     }
-  // })}
   loading: boolean = false;
 
   fetchBranch(): void {
@@ -82,9 +73,32 @@ export class AppComponent {
       error: (error) => {
         console.error('Error fetching branches:', error);
       }
- 
-  })
-}
+    });
+  }
+
+  fetchBranchDetails(branchName: string): void {
+    this.giteaService.getBranchDetails(this.username, this.repoName, branchName).subscribe({
+      next: (branchDetails: any) => {
+        this.branchDetails = branchDetails;
+        console.log('Branch details:', branchDetails);
+  
+        // Use getBranchFiles to fetch files in the branch
+        this.giteaService.getBranchFiles(this.username, this.repoName, branchName).subscribe({
+          next: (files: any) => {
+            this.branchFiles = files;
+            console.log('Branch files:', files);
+          },
+          error: (error: any) => {
+            console.error('Error fetching branch files:', error);
+          }
+        });
+      },
+      error: (error: any) => {
+        console.error('Error fetching branch details:', error);
+      }
+    });
+  }
+
   // fetchBranchDetails(branchName: string): void {
   //   // if (!this.branch) {
   //   //   console.error('Branch name is undefined.');

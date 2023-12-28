@@ -1,4 +1,4 @@
-<div>
+<!-- <div>
   <h2>Create Repository</h2>
   <label for="repoName">Repository Name:</label>
   <input [(ngModel)]="repoName" id="repoName" placeholder="Enter repository name" />
@@ -25,7 +25,7 @@
   <div *ngFor="let file of allFiles">
     <p (click)="DiveIn(file)">{{ file.name }}</p>
   </div>
-</div>
+</div> -->
 
 
 <div>
@@ -35,7 +35,29 @@
   <label for="repoName">Repository Name:</label>
   <input [(ngModel)]="repoName" id="repoName" placeholder="Enter repository name" />
   <button (click)="fetchBranch()">fetch</button>
-  <p *ngFor="let branch of allBranches">{{ branch.name }}</p>
+
+  <div *ngIf="allBranches && allBranches.length > 0">
+    <p>Branches:</p>
+    <ul>
+      <li *ngFor="let branch of allBranches">
+        <span>{{ branch.name }}</span>
+        <div *ngFor="let file of allFiles">
+          <p (click)="DiveIn(file)">{{ file.name }}</p>
+        </div>
+        <button (click)="fetchBranchDetails(branch.name)">Fetch Details</button>
+      </li>
+    </ul>
+  </div>
+  <div *ngIf="branchDetails">
+    <!-- Display other branch details as needed -->
+
+    <h3>Files in {{ branchDetails.name }} branch:</h3>
+    <ul>
+      <li *ngFor="let file of branchFiles">
+        <p (click)="DiveIn(file)">{{ file.name }}</p>
+      </li>
+    </ul>
+  </div>
 </div>
 
 
