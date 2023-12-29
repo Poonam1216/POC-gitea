@@ -176,6 +176,7 @@
 
 
 <div>
+  <h1>Update File</h1>
   <p>username: </p>
   <input [(ngModel)]="username" placeholder="Enter GitHub username...">
   <button (click)="loadRepositories()">Load Repositories</button>
@@ -227,7 +228,7 @@
 </div>
 
 
-<div>
+<!-- <div>
   <h2>Fetch Commit History</h2>
   <label for="username">Owner:</label>
   <input [(ngModel)]="username" id="username" placeholder="Enter owner" />
@@ -243,10 +244,10 @@
       </li>
     </ul>
   </div>
-</div>
+</div> -->
 
 
-<div>
+<!-- <div>
   <h2>Delete</h2>
 
 
@@ -256,33 +257,33 @@
     <input [(ngModel)]="username" placeholder="Enter GitHub username...">
     <button (click)="loadRepositories()">Load Repositories</button>
     <br>
-    <!-- Select repository, branch, folder, and file -->
-    <div *ngIf="repositories && repositories.length > 0">
-      <label for="repositories">Select Repository:</label>
-      <select id="repositories" [(ngModel)]="selectedRepoName" (change)="loadBranches()">
-        <option value="">-- Select Repository --</option>
-        <option *ngFor="let repo of repositories" [value]="repo.name">{{ repo.name }}</option>
-      </select>
-    </div>
-    <br>
+  
+<div *ngIf="repositories && repositories.length > 0">
+  <label for="repositories">Select Repository:</label>
+  <select id="repositories" [(ngModel)]="selectedRepoName" (change)="loadBranches()">
+    <option value="">-- Select Repository --</option>
+    <option *ngFor="let repo of repositories" [value]="repo.name">{{ repo.name }}</option>
+  </select>
+</div>
+<br>
 
-    <div *ngIf="branches.length > 0">
-      <label for="branches">Select Branch:</label>
-      <select id="branches" [(ngModel)]="selectedBranch" (change)="loadFolderContents()">
-        <option value="">-- Select Branch --</option>
-        <option *ngFor="let branch of branches" [value]="branch.name">
-          {{ branch.name }}
-        </option>
-      </select>
-    </div>
-
-
-    <button (click)="deleteBranch()">Delete Branch</button>
-  </div>
+<div *ngIf="branches.length > 0">
+  <label for="branches">Select Branch:</label>
+  <select id="branches" [(ngModel)]="selectedBranch" (change)="loadFolderContents()">
+    <option value="">-- Select Branch --</option>
+    <option *ngFor="let branch of branches" [value]="branch.name">
+      {{ branch.name }}
+    </option>
+  </select>
 </div>
 
 
-<div>
+<button (click)="deleteBranch()">Delete Branch</button>
+</div>
+</div> -->
+
+
+<!-- <div>
   <h2>Delete File</h2>
 
   <h2>Fetch all files</h2>
@@ -303,7 +304,7 @@
     <pre>{{ fileContent }}</pre>
     <button (click)="deleteFile()">Delete File</button>
   </div>
-</div>
+</div> -->
 
 
 <!-- user-create -->
@@ -323,7 +324,11 @@
     <input type="submit" value="Submit">
   </form>
 </div> -->
-<div>
+
+
+
+
+<!-- <div>
   <h2>Delete Repository</h2>
 
   <label for="username">Username:</label>
@@ -333,7 +338,7 @@
   <input [(ngModel)]="repoName" id="repoName" placeholder="Enter repository name" />
 
   <button (click)="deleteRepository()">Delete Repository</button>
-</div>
+</div> -->
 
 <br><br><br><br><br><br><br><br>
 <!-- 

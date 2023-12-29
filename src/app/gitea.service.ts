@@ -225,21 +225,6 @@ private apiUrl ='http://localhost:3000/api/v1';
   }
 
 
-  // deleteFile(owner: string, repo: string, filepath: string, sha: string): Observable<any> {
-  //   const url = `${this.apiUrl}/repos/${owner}/${repo}/contents/${filepath}`;
-  //   const headers = this.getHeaders();
-  //   const body = {
-  //     author: {
-  //       name: 'Your Name',
-  //       email: 'your.email@example.com',
-  //     },
-  //     sha: sha,
-  //     message: 'Delete file: ' + filepath,
-  //   };
-
-  //   return this.http.delete(url, { headers, body });
-  // }
-
 
   deleteFile(username: string, repoName: string, filepath: string, sha: string): Observable<any> {
     const url = `${this.apiUrl}/repos/${username}/${repoName}/contents/${filepath}`;
