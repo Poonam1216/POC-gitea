@@ -6,6 +6,7 @@
   <p>{{ createdRepoMessage }}</p>
 </div>
 
+
 <div>
   <h2>Fetch all Repos</h2>
   <label for="userNameFetch">User Name:</label>
@@ -13,7 +14,6 @@
   <button (click)="fetchAllRepos()">fetch</button>
   <p>{{ allRepos.toString() }}</p>
 </div>
-
 
 <div>
   <h2>Fetch all files</h2>
@@ -45,7 +45,9 @@
   <button (click)="createBranch()">Create Branch</button>
 </div> -->
 
-<div>
+
+
+<!-- <div>
   <h2>Fetch all Branches</h2>
   <label for="userName">User Name:</label>
   <input [(ngModel)]="username" id="userName" placeholder="Enter repository name" />
@@ -60,18 +62,18 @@
         <span>{{ branch.name }}</span>
         <button (click)="fetchBranchDetails(branch.name)">Fetch Details</button>
         <div *ngIf="branchDetails && branchDetails.name === branch.name">
-          <!-- Display other branch details as needed -->
+          Display other branch details as needed
 
-          <h3>Files in {{ branchDetails.name }} branch:</h3>
-          <ul>
-            <li *ngFor="let file of branchFiles">
-              <p (click)="DiveIn(file)">{{ file.name }}</p>
-            </li>
-          </ul>
-        </div>
-      </li>
-    </ul>
+<h3>Files in {{ branchDetails.name }} branch:</h3>
+<ul>
+  <div *ngFor="let file of allFiles">
+    <p (click)="DiveIn(file)">{{ file.name }}</p>
   </div>
+</ul>
+</div>
+</li>
+</ul>
+</div>
 </div>
 
 <div>
@@ -95,46 +97,245 @@
 <div>
   <h2>Fetch Commit Details</h2>
   <label for="username">Owner:</label>
-  <input [(ngModel)]="username" id="username" placeholder="Enter username" />
+  <input [(ngModel)]="username" id="username" placeholder="Enter owner" />
   <label for="repoName">Repository:</label>
   <input [(ngModel)]="repoName" id="repoName" placeholder="Enter repository" />
-  <label for="commitHash">Commit Hash:</label>
-  <input [(ngModel)]="commitHash" id="commitHash" placeholder="Enter commit hash" />
+  <label for="sha">Commit SHA:</label>
+  <input [(ngModel)]="sha" id="sha" placeholder="Enter commit SHA" />
   <button (click)="fetchCommitDetails()">Fetch Commit Details</button>
-
   <div *ngIf="commitDetails">
     <h3>Changed Files:</h3>
-    <ul *ngIf="commitDetails.files && commitDetails.files.length > 0; else noFiles">
+    <ul>
       <li *ngFor="let file of commitDetails.files">
         <p>{{ file.filename }}</p>
       </li>
     </ul>
-    <ng-template #noFiles>
-      <p>No files changed in this commit.</p>
-    </ng-template>
   </div>
-</div>
+</div> -->
+
+<!-- <div>
+  <h1>Fetch Public Repo</h1>
+  <label for="userNameFetch">User Name:</label>
+  <input [(ngModel)]="username" id="userNameFetch" placeholder="Enter repository name" />
+  <button (click)="fetchAllRepos()">fetch</button>
+  <div *ngFor="let repo of allRepos">
+    <label for="userNameFetch">User Name:</label>
+    <input [(ngModel)]="username" id="userNameFetch" placeholder="Enter repository name" />
+    <button (click)="fetchAllRepos()">fetch</button>
+    <p>{{ allRepos.toString() }}</p>
+    <div>{{ repo.name }}</div>
+  </div>
+</div> -->
+
+
+<!-- github.component.html -->
+
+<!-- Assuming this is your entire HTML template -->
 
 
 
 
 <!-- <div>
-  <h2>Update files</h2>
-  <label for="userfetch">username:</label>
-  <input [(ngModel)]="username" id="userupdate" placeholder="Enter UserName" />
-  <label for="repoName">Repository Name:</label>
-  <input [(ngModel)]="repoName" id="repoName" placeholder="Enter repository name" />
-  <label for="updFileCont">Content:</label>
-  <textarea id="updFileCont" [(ngModel)]="fileContent"></textarea><br />
-  <label for="updFileCont">File Name</label>
-  <input [(ngModel)]="fileName" id="FileName" type="text" placeholder="Enter File Name" />
-  <button (click)="updateFiles()">Update</button>
-  <div *ngIf="updateFileName">
-    <p>Updated File Name: {{ updateFileName }}</p>
-  </div>
+  <h1>Fetch All file from the Repos</h1>
+  <label for="username">User Name:</label>
+  <input type="text" [(ngModel)]="username" id="username" />
+  <button (click)="fetchUserRepos()">Fetch Repos</button>
+</div>
+
+<div *ngIf="allRepos.length > 0">
+  <h2>Repositories:</h2>
+  <ul>
+    <li *ngFor="let repo of allRepos">
+      <button (click)="fetchRepoFiles(repo.name)">{{ repo.name }}</button>
+    </li>
+  </ul>
+</div>
+
+<div *ngIf="selectedRepoFiles.length > 0">
+  <h2>Files and Directories in {{ selectedRepoName }}:</h2>
+  <ol>
+    <li *ngFor="let file of selectedRepoFiles">
+      <ng-container *ngIf="file.type === 'file'; else dirTemplate">
+        <button (click)="fetchFileContent(file)">{{ file.name }}</button>
+      </ng-container>
+      <ng-template #dirTemplate>
+        <button (click)="fetchRepoFilesInDir(file)">{{ file.name }}</button>
+      </ng-template>
+    </li>
+  </ol>
+</div>
+
+<div *ngIf="selectedFileContent !== null">
+  <h2>Content of {{ selectedFileName }}:</h2>
+  <pre>{{ selectedFileContent }}</pre>
 </div> -->
 
-<!-- just to reflect new banch -->
+
+
+
+
+
+<div>
+  <p>username: </p>
+  <input [(ngModel)]="username" placeholder="Enter GitHub username...">
+  <button (click)="loadRepositories()">Load Repositories</button>
+  <br>
+  <!-- Select repository, branch, folder, and file -->
+  <div *ngIf="repositories && repositories.length > 0">
+    <label for="repositories">Select Repository:</label>
+    <select id="repositories" [(ngModel)]="selectedRepoName" (change)="loadBranches()">
+      <option value="">-- Select Repository --</option>
+      <option *ngFor="let repo of repositories" [value]="repo.name">{{ repo.name }}</option>
+    </select>
+  </div>
+  <br>
+
+  <div *ngIf="branches.length > 0">
+    <label for="branches">Select Branch:</label>
+    <select id="branches" [(ngModel)]="selectedBranch" (change)="loadFolderContents()">
+      <option value="">-- Select Branch --</option>
+      <option *ngFor="let branch of branches" [value]="branch.name">
+        {{ branch.name }}
+      </option>
+    </select>
+  </div>
+
+  <br>
+  <div *ngIf="folders.length > 0">
+    <label for="folders">Select Folder:</label>
+    <select id="folders" [(ngModel)]="selectedFolderPath" (change)="loadFolderContents()">
+      <option value="/">-- Root --</option>
+      <option *ngFor="let folder of folders" [value]="folder">{{ folder }}</option>
+    </select>
+  </div>
+  <br>
+  <div *ngIf="files.length > 0">
+    <label for="files">Select File:</label>
+    <select id="files" [(ngModel)]="selectedFileName">
+      <option value="">-- Select File --</option>
+      <option *ngFor="let file of files" [value]="file.name">{{ file.name }}</option>
+    </select>
+  </div>
+  <br>
+  <!-- Add a textarea for editing content -->
+  <textarea [(ngModel)]="fileContent" placeholder="Enter file content..."></textarea>
+
+  <!-- Add a button to trigger the file update -->
+  <button (click)="updateFileContent()">Update File</button>
+
+
+</div>
+
+
+<div>
+  <h2>Fetch Commit History</h2>
+  <label for="username">Owner:</label>
+  <input [(ngModel)]="username" id="username" placeholder="Enter owner" />
+  <label for="repoName">Repository:</label>
+  <input [(ngModel)]="repoName" id="repoName" placeholder="Enter repository" />
+  <button (click)="fetchCommitHistory()">Fetch Commit History</button>
+
+  <div *ngIf="commitHistory && commitHistory.length > 0">
+    <h3>Commit History:</h3>
+    <ul>
+      <li *ngFor="let commit of commitHistory">
+        <p>commit sha: {{ commit.sha }} - commit meesage: {{ commit.commit.message }}</p>
+      </li>
+    </ul>
+  </div>
+</div>
+
+
+<div>
+  <h2>Delete</h2>
+
+
+  <div>
+    <h2>Fetch all Repos</h2>
+    <p>username: </p>
+    <input [(ngModel)]="username" placeholder="Enter GitHub username...">
+    <button (click)="loadRepositories()">Load Repositories</button>
+    <br>
+    <!-- Select repository, branch, folder, and file -->
+    <div *ngIf="repositories && repositories.length > 0">
+      <label for="repositories">Select Repository:</label>
+      <select id="repositories" [(ngModel)]="selectedRepoName" (change)="loadBranches()">
+        <option value="">-- Select Repository --</option>
+        <option *ngFor="let repo of repositories" [value]="repo.name">{{ repo.name }}</option>
+      </select>
+    </div>
+    <br>
+
+    <div *ngIf="branches.length > 0">
+      <label for="branches">Select Branch:</label>
+      <select id="branches" [(ngModel)]="selectedBranch" (change)="loadFolderContents()">
+        <option value="">-- Select Branch --</option>
+        <option *ngFor="let branch of branches" [value]="branch.name">
+          {{ branch.name }}
+        </option>
+      </select>
+    </div>
+
+
+    <button (click)="deleteBranch()">Delete Branch</button>
+  </div>
+</div>
+
+
+<div>
+  <h2>Delete File</h2>
+
+  <h2>Fetch all files</h2>
+  <label for="userfetch">username:</label>
+  <input [(ngModel)]="username" id="userfetch" placeholder="Enter UserName" />
+
+  <label for="repoName">Repository Name:</label>
+  <input [(ngModel)]="repoName" id="repoName" placeholder="Enter repository name" />
+
+  <button (click)="fetchAllFiles()">fetch</button>
+
+  <div *ngFor="let file of allFiles">
+    <p (click)="DiveIn(file)">{{ file.name }}</p>
+  </div>
+
+  <div *ngIf="fileContent">
+    <h3>File Content:</h3>
+    <pre>{{ fileContent }}</pre>
+    <button (click)="deleteFile()">Delete File</button>
+  </div>
+</div>
+
+
+<!-- user-create -->
+<!-- <div>
+  <h2>Create New User</h2>
+  <form (ngSubmit)="onSubmit()">
+    <label for="email">Email:</label><br>
+    <input type="email" id="email" name="email" [(ngModel)]="user.email"><br>
+    <label for="password">Password:</label><br>
+    <input type="password" id="password" name="password" [(ngModel)]="user.password"><br>
+    <label for="username">Username:</label><br>
+    <input type="text" id="username" name="username" [(ngModel)]="user.username"><br>
+   
+    <label for="full_name">Full Name:</label><br>
+    <input type="text" id="full_name" name="full_name" [(ngModel)]="user.full_name"><br>
+
+    <input type="submit" value="Submit">
+  </form>
+</div> -->
+<div>
+  <h2>Delete Repository</h2>
+
+  <label for="username">Username:</label>
+  <input [(ngModel)]="username" id="username" placeholder="Enter Gitea username" />
+
+  <label for="repoName">Repository Name:</label>
+  <input [(ngModel)]="repoName" id="repoName" placeholder="Enter repository name" />
+
+  <button (click)="deleteRepository()">Delete Repository</button>
+</div>
+
+<br><br><br><br><br><br><br><br>
 <!-- 
 <h2>Repository List</h2>
 <ul *ngIf="allRepos && allRepos.length > 0">

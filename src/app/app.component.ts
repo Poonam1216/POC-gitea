@@ -1,4 +1,6 @@
+import { HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
+import { map, Observable } from 'rxjs';
 import { GiteaService } from './gitea.service';
 
 @Component({
@@ -30,8 +32,32 @@ export class AppComponent {
   commitHistory: any;
   commitHash: any;
   commitDetails: any;
-
-
+  sha: any;
+  repoDetails: any;
+  publicRepos: any[]=[];
+  repoFiles: any[]=[];
+  usernameOrRepo: string='';
+  selectedBranch: string='';
+  selectedRepo: string='';
+  branchName:any;
+  repos: any[]=[];
+  files: any[]=[];
+  fileDetails: any;
+  selectedRepository: any;
+  repositories: any;
+  selectedRepoName: string = '';
+  selectedRepoFiles: any[] = [];
+  selectedFileName: string = '';
+  selectedFileContent: any = null;
+  branches:{ name: string }[]=[];
+  selectedFolderPath: string='';
+  folders: any[]=[];
+  name:string='';
+  details?: string='';
+  branchToDelete: string='';
+  selectedFile: any;
+ 
+ 
 
   constructor(private giteaService: GiteaService) {}
   createRepository(): void {
@@ -57,16 +83,30 @@ export class AppComponent {
       }
     })
   }
-  fetchAllFiles(){
-    this.giteaService.getAllFiles(this.username, this.repoName, this.filePath).subscribe({
-      next:(response)=>{
+  // fetchAllFiles(){
+  //   this.giteaService.getAllFiles(this.username, this.repoName, this.filePath).subscribe({
+  //     next:(response)=>{
+  //       this.allFiles = response;
+  //       console.log(response)
+  //     },
+  //     error:(error)=>{
+  //       console.error(error);
+  //     }
+  //   })
+  // }
+
+
+  fetchAllFiles() {
+    this.filePath = ''; // Clear the selected file path
+    this.giteaService.getAllFiles(this.username, this.repoName, '').subscribe({
+      next: (response) => {
         this.allFiles = response;
-        console.log(response)
+        console.log(response);
       },
-      error:(error)=>{
+      error: (error) => {
         console.error(error);
-      }
-    })
+      },
+    });
   }
   loading: boolean = false;
 
@@ -134,35 +174,129 @@ export class AppComponent {
     });
   }
 
-  fetchCommitDetails(): void {
-    if (!this.username || !this.repoName || !this.commitHash) {
-      console.error('Username, repository name, and commit hash are required.');
-      return;
-    }
-  
-    this.giteaService.getCommitDetails(this.username, this.repoName, this.commitHash).subscribe({
-      next: (commitDetails: any) => {
-        console.log('Commit details:', commitDetails);
-        this.commitDetails = commitDetails;
+  fetchCommitDetails() {
+    this.giteaService.getChangedFileFromCommit(this.username, this.repoName, this.sha).subscribe(
+      (data: any) => {
+        this.commitDetails = data;
+        console.log('Commit Details:', this.commitDetails);
+      },
+      (error:any) => {
+        console.error('Error fetching commit details:', error);
+      }
+    );
+  }
+
+
+  fetchUserRepos() {
+    // const username = 'PoonamRani'; // Change this to the desired username
+    this.giteaService.getAllRepos(this.username).subscribe({
+     next: (repos) => {
+        this.allRepos = repos;
+        this.selectedRepoName = '';
+        this.selectedRepoFiles = [];
+        this.selectedFileName = '';
+        this.selectedFileContent = null;
+        // Optionally, you can perform any additional logic with the fetched repos
+      },
+     error:(error) => {
+        console.error('Error fetching user repos:', error);
+      }
+  });
+  }
+  fetchRepoFiles(repoName: string) {
+    this.selectedRepoName = repoName;
+    const defaultBranch = 'master';
+    this.selectedFileContent = null;
+    this.giteaService.getRepoFiles(this.username, repoName, this.filePath, defaultBranch).subscribe({
+      next: (files: any[]) => {
+        console.log('Files in repo:', files);
+        this.selectedRepoFiles = files;
+        this.selectedFileName = '';
       },
       error: (error: any) => {
-        console.error('Error fetching commit details:', error);
-        // Handle the error as needed, e.g., show an error message.
+        console.error(`Error fetching files for repo ${repoName}:`, error);
       }
     });
   }
   
 
+  fetchFileContent(file: any) {
+
+    if(file.type === 'file'){
+    this.selectedFileName = file.name;
+    this.giteaService.getFileContents(this.username, this.selectedRepoName, file.path).subscribe({
+      next: (data) => {
+        this.selectedFileContent = atob(data.content);
+      },
+      error: (error) => {
+        console.error(`Error fetching content for file ${file.name}:`, error);
+      }
+    });
+  }else{
+     console.log('Selected item is not a file.');
+  }
+  }
+
+
+  // fetchRepoFilesInDir(file: any) {
+  //   const fullPath = file.type === 'dir'
+  //     ? `${this.currentPath}/${file.name}`
+  //     : `${this.currentPath}/${file.path}`;
+    
+  //   console.log('Fetching files for directory:', fullPath);
+  
+  //   this.giteaService.getRepoFiles(this.username, this.selectedRepoName, fullPath,).subscribe({
+  //     next: (files: any[]) => {
+  //       this.currentPath = fullPath;  
+  //       this.selectedRepoFiles = files;
+  //       this.selectedFileName = '';
+  //       this.selectedFileContent = null;
+  //     },
+  //     error: (error: any) => {
+  //       console.error(`Error fetching files for directory ${fullPath}:`, error);
+  //     }
+  //   });
+  // }
+  
+  
+
+  // DiveIn(file: any): void {
+  //   if (file.type === 'file') {
+
+  //     this.giteaService.getFileContent(this.username, this.repoName, file.path).subscribe({
+  //       next: (response) => {
+  //         this.fileContent = atob(response.content); // Decode 
+  //       },
+  //       error: (error) => {
+  //         console.error('Error fetching file content:', error);
+  //       }
+  //     });
+  //   } else if (file.type === 'dir') {
+  //     this.giteaService.getAllFiles(this.username, this.repoName, file.path).subscribe({
+  //       next: (response) => {
+  //         this.allFiles = response;
+  //         console.log(response);
+  //       },
+  //       error: (_error) => {
+  //         console.error("Error fetching files for this folder");
+  //       }
+  //     });
+  //   }
+  // }
+
+
+
   DiveIn(file: any): void {
     if (file.type === 'file') {
-
       this.giteaService.getFileContent(this.username, this.repoName, file.path).subscribe({
         next: (response) => {
           this.fileContent = atob(response.content); // Decode 
+          this.sha = response.sha;
+          this.filePath = file.path; // Set the selected file's path
         },
         error: (error) => {
           console.error('Error fetching file content:', error);
-        }
+        },
       });
     } else if (file.type === 'dir') {
       this.giteaService.getAllFiles(this.username, this.repoName, file.path).subscribe({
@@ -170,53 +304,270 @@ export class AppComponent {
           this.allFiles = response;
           console.log(response);
         },
-        error: (error) => {
-          console.error("Error fetching files for this folder");
-        }
+        error: (_error) => {
+          console.error('Error fetching files for this folder');
+        },
       });
     }
   }
+  
+  loadRepositories(): void {
+    if (!this.username) {
+      console.error('Gitea username is required.');
+      return;
+    }
 
-updateFiles(): void {
-  const filePath = this.fileName;
-  const fullPath = filePath ? `/${filePath}` : '';
-
-  this.giteaService.getFileContent(this.username, this.repoName, fullPath).subscribe({
-    next: (response) => {
-      const sha = response.sha;
-      const content = btoa(this.fileContent); // Encode content to Base64
-
-      if (sha) {
-        this.giteaService.updateFiles(this.username, this.repoName, fullPath, content, sha)
-          .subscribe({
-            next: (updateResponse) => {
-              this.updateFileName = updateResponse.name;
-              console.log(`File updated successfully: ${this.updateFileName}`);
-            },
-            error: (updateError) => {
-              console.error('Error updating file:', updateError);
-            }
-          });
-      } else {
-        // Create a new file
-        this.giteaService.createFile(this.username, this.repoName, fullPath, content)
-          .subscribe({
-            next: (createResponse) => {
-              this.updateFileName = createResponse.name;
-              console.log(`File created successfully: ${this.updateFileName}`);
-            },
-            error: (createError) => {
-              console.error('Error creating file:', createError);
-            }
-          });
+    this.giteaService.getUserRepos(this.username).subscribe({
+      next: (repos: any[]) => {
+        this.repositories = repos;
+      },
+      error: (error: any) => {
+        console.error('Error loading repositories:', error);
       }
+    });
+  }
+
+  // Load branches for the selected repository
+  loadBranches(): void {
+    if (!this.selectedRepoName) {
+      console.error('Repository name is required.');
+      return;
+    }
+  
+    this.giteaService.getRepoBranches(this.username, this.selectedRepoName).subscribe({
+      next: (branches: any[]) => {
+        console.log('Branches:', branches);
+        // Assuming each branch has a 'name' property, adjust accordingly
+        this.branches = branches.map(branch => ({ name: branch.name, details: 'Add details here if available' }));
+      },
+      error: (error: any) => {
+        console.error('Error loading branches:', error);
+      }
+    });
+  }
+  
+  
+
+  loadFolderContents(): void {
+    if (!this.selectedRepoName || !this.selectedBranch) {
+      console.error('Repository name and branch are required.');
+      return;
+    }
+  
+    // Assuming that '/' is a valid folder path, modify this check if needed
+    const path = this.selectedFolderPath === '/' ? '' : this.selectedFolderPath;
+  
+    this.giteaService.getRepoFiles(this.username, this.selectedRepoName, path, this.selectedBranch).subscribe({
+      next: (contents: any[]) => {
+        // Filter items based on whether they are directories or files
+        const folders = contents.filter(item => item.type === 'dir');
+        const files = contents.filter(item => item.type === 'file');
+  
+        // If there are nested folders, fetch their contents
+        folders.forEach(folder => {
+          this.giteaService.getRepoFiles(this.username, this.selectedRepoName, `${path}/${folder.name}`, this.selectedBranch)
+            .subscribe({
+              next: (nestedContents: any[]) => {
+                // Add nested folder contents to the existing folders and files arrays
+                this.folders = [...this.folders, ...nestedContents.filter(item => item.type === 'dir').map(item => `${folder.name}/${item.name}`)];
+                this.files = [...this.files, ...nestedContents.filter(item => item.type === 'file')];
+              },
+              error: (error: any) => {
+                console.error(`Error loading contents of folder ${folder.name}:`, error);
+              }
+            });
+        });
+      },
+      error: (error: any) => {
+        console.error('Error loading folder contents:', error);
+      }
+    });
+  }
+  
+  
+  // Update the selected file content
+  // updateFileContent(): void {
+  //   if (!this.selectedRepoName || !this.selectedBranch || !this.selectedFolderPath || !this.selectedFileName || !this.fileContent) {
+  //     console.error('Repository name, branch, folder path, file name, and content are required.');
+  //     return;
+  //   }
+
+  //   const filePathToUpdate = this.selectedFolderPath === '/' ? this.selectedFileName : `${this.selectedFolderPath}/${this.selectedFileName}`;
+
+  //   this.giteaService.updateFile(
+  //     this.username,
+  //     this.selectedRepoName,
+  //     filePathToUpdate,
+  //     this.fileContent,
+  //     this.selectedBranch
+  //   ).subscribe({
+  //     next: (response: any) => {
+  //       console.log('File updated successfully:', response);
+  //       // Handle success, if needed
+  //       // After updating, you can reload the folder contents to reflect changes
+  //       this.loadFolderContents();
+  //     },
+  //     error: (error: any) => {
+  //       console.error('Error updating file:', error);
+  //       // Handle error, if needed
+  //     }
+  //   });
+  // }
+
+  // Update the file content in the repository
+// Update the file content in the repository
+updateFileContent(): void {
+  // Check if any of the required parameters is missing
+  if (!this.selectedRepoName || !this.selectedBranch || !this.selectedFolderPath || !this.selectedFileName || !this.fileContent) {
+    console.error('Repository name, branch, folder path, file name, and content are required.');
+    return;
+  }
+
+  // Construct the file path based on the selected folder path
+  const filePathToUpdate = this.selectedFolderPath === '/' ? this.selectedFileName : `${this.selectedFolderPath}/${this.selectedFileName}`;
+
+  // Fetch the latest commit SHA for the selected branch
+  this.getLatestCommitSHA(this.username, this.selectedRepoName, this.selectedBranch).subscribe({
+    next: (commitSHA: string) => {
+
+      console.log("File")
+      if (!commitSHA) {
+        console.error('Latest commit SHA is undefined or empty.');
+        // Handle error or return, depending on your requirements
+        // return;
+      }
+
+      console.log('Latest commit SHA:', commitSHA); // Log the commit SHA
+
+      // Update the file with the latest commit SHA included in the headers
+      const headers = new HttpHeaders({ 'If-Match': "920a569ae69d22c85c60ef8356cfccd035ef8355" });
+      
+      this.giteaService.updateFile(
+        this.username,
+        this.selectedRepoName,
+        filePathToUpdate, // Use the constructed file path
+        this.fileContent,
+        this.selectedBranch,
+        headers
+      ).subscribe({
+        next: (response: any) => {
+
+          console.log('File updated successfully:', response);
+          // Handle success, if needed
+          // After updating, you can reload the folder contents to reflect changes
+          this.loadFolderContents();
+        },
+        error: (error: any) => {
+          console.error('Error updating file:', error);
+          // Handle error, if needed
+        }
+      });
     },
-    error: (error) => {
-      console.error('Error fetching file content:', error);
+    error: (error: any) => {
+      console.error('Error fetching latest commit SHA:', error);
+      // Handle error, if needed
     }
   });
 }
 
 
 
+
+
+getLatestCommitSHA(username: string, repoName: string, branchName: string): Observable<string> {
+  // Fetch branches for the repository
+  return this.giteaService.getBranches(username, repoName).pipe(
+    map((branches: any[]) => {
+      // Find the branch by name
+      const branch = branches.find(b => b.name === branchName);
+
+      // Return the latest commit SHA for the branch
+      return branch ? branch.commit.sha : '';
+    })
+  );
 }
+  
+
+
+deleteBranch(): void {
+  if (this.selectedRepoName && this.selectedBranch) {
+    const owner = this.username;
+    const repo = this.selectedRepoName;
+    const branch = this.selectedBranch;
+
+    this.giteaService.deleteBranch(owner, repo, branch).subscribe(
+      (response) => {
+        if (response === null) {
+          console.log('Branch deleted successfully.');
+          // Handle success, if needed
+        } else {
+          console.log('Unexpected response after deleting branch:', response);
+          // Handle unexpected response
+        }
+      },
+      (error) => {
+        console.error('Error deleting branch:', error);
+        // Handle error, if needed
+      }
+    );
+  }
+}
+
+
+
+deleteFolder(): void {
+  if (this.sha) {
+    this.giteaService.deleteFolder(this.username, this.repoName, this.selectedFile.path).subscribe(
+      (response) => {
+        console.log('Folder deleted successfully:', response);
+      },
+      (error) => {
+        console.error('Error deleting folder:', error);
+      }
+    );
+  } else {
+    console.error('Folder SHA is not available. Fetch the folder first.');
+  }
+}
+
+deleteFile(): void {
+  if (this.sha) {
+    this.giteaService.deleteFile(this.username, this.repoName, this.filePath, this.sha).subscribe(
+      (response) => {
+        if (response.content === null) {
+          console.log('File deleted successfully.');
+          // Additional handling, if needed
+        } else {
+          console.log('Unexpected response after deleting file:', response);
+          // Handle unexpected response
+        }
+      },
+      (error) => {
+        console.error('Error deleting file:', error);
+        // Handle error, if needed
+      }
+    );
+  } else {
+    console.error('File SHA is not available. Fetch the file first.');
+  }
+}
+
+
+deleteRepository(): void {
+  this.giteaService.deleteRepository(this.username, this.repoName).subscribe(
+    (response) => {
+      console.log('Repository deleted successfully:', response);
+    },
+    (error) => {
+      console.error('Error deleting repository:', error);
+    }
+  );
+}
+
+
+}
+
+
+
+
+
