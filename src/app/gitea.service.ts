@@ -7,15 +7,14 @@ import { forkJoin, map, Observable,switchMap } from 'rxjs';
   })
   export class GiteaService {
 
-
-//   private apiUrl = 'http://localhost:3000/api/v1';
 private apiUrl ='http://localhost:3000/api/v1';
  
   // private username= 'PoonamRani';
   // private password= '172eb9c996e50759f5ae5ea091f81e1bf8f5eb6c'
 
  private username = 'poonamgaian';
-  private password = '66fb170d73916344855cf3c43be55d799265b762';
+ private password = '66fb170d73916344855cf3c43be55d799265b762';
+
   constructor(private http: HttpClient) {}
 
   private getHeaders(): HttpHeaders {
@@ -118,7 +117,7 @@ private apiUrl ='http://localhost:3000/api/v1';
 
 
 
-  getCommitHistory(username: string, repo: string, sha: string = 'master'): Observable<any> {
+  getCommitHistory(username: string, repo: string, sha: string = ''): Observable<any> {
     const url = `${this.apiUrl}/repos/${username}/${repo}/commits`;
     
     // You can customize the parameters based on your needs
@@ -182,28 +181,28 @@ private apiUrl ='http://localhost:3000/api/v1';
   //   return this.http.put<any>(url, requestBody, { headers });
   // }
 
-  updateFile(
-    username: string,
-    repoName: string,
-    filePath: string,
-    content: string,
-    branch: string,
-    headers: HttpHeaders // Pass headers as an argument
-  ): Observable<any> {
-    const url = `${this.apiUrl}/repos/${username}/${repoName}/contents/${filePath}`;
-    const body = {
-      content: btoa(content), // Encode content as base64
-      branch: branch
+  updateFiles(owner: string, repo: string, filePath: string, content: string, branch: string, sha: string): Observable<any> {
+    const url = `${this.apiUrl}/repos/${owner}/${repo}/contents/${filePath}`;
+    
+    // Define the request body
+    const requestBody = {
+      author: { name: 'Your Author Name', email: 'your.email@example.com' },  // Update with your author details
+      branch: branch,
+      committer: { name: 'Your Committer Name', email: 'your.committer@example.com' },  // Update with your committer details
+      content: btoa(content),  // Base64 encode the content
+      message: 'Your commit message',  // Update with your commit message
+      sha: sha
+      // Add other parameters as needed
     };
-    console.log("content",content,)
-    return this.http.put(url, body, { headers });
+
+    return this.http.put(url, requestBody, { headers: this.getHeaders() });
   }
 
 
-  getLatestCommitSHA(username: string, repoName: string, branch: string): Observable<string> {
-    const url = `${this.apiUrl}/${username}/${repoName}/branches/${branch}`;
-    return this.http.get<{ commit: { id: string } }>(url).pipe(map(response => response.commit.id));
-  }
+  // getLatestCommitSHA(username: string, repoName: string, branch: string): Observable<string> {
+  //   const url = `${this.apiUrl}/${username}/${repoName}/branches/${branch}`;
+  //   return this.http.get<{ commit: { id: string } }>(url).pipe(map(response => response.commit.id));
+  // }
  
 
   getBranches(username: string, repoName: string): Observable<any> {

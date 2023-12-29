@@ -60,6 +60,7 @@ export class AppComponent {
  
 
   constructor(private giteaService: GiteaService) {}
+
   createRepository(): void {
     this.giteaService.createRepository(this.repoName).subscribe({
       next: (_response) => {
@@ -72,6 +73,7 @@ export class AppComponent {
     });
   }
 
+
   fetchAllRepos(){
     this.giteaService.getAllRepos(this.username).subscribe({
       next:(response)=>{
@@ -83,31 +85,20 @@ export class AppComponent {
       }
     })
   }
-  // fetchAllFiles(){
-  //   this.giteaService.getAllFiles(this.username, this.repoName, this.filePath).subscribe({
-  //     next:(response)=>{
-  //       this.allFiles = response;
-  //       console.log(response)
-  //     },
-  //     error:(error)=>{
-  //       console.error(error);
-  //     }
-  //   })
-  // }
-
-
-  fetchAllFiles() {
-    this.filePath = ''; // Clear the selected file path
-    this.giteaService.getAllFiles(this.username, this.repoName, '').subscribe({
-      next: (response) => {
+  fetchAllFiles(){
+    this.giteaService.getAllFiles(this.username, this.repoName, this.filePath).subscribe({
+      next:(response)=>{
         this.allFiles = response;
-        console.log(response);
+        console.log(response)
       },
-      error: (error) => {
+      error:(error)=>{
         console.error(error);
-      },
-    });
+      }
+    })
   }
+
+
+  
   loading: boolean = false;
 
   fetchBranch(): void {
@@ -175,15 +166,15 @@ export class AppComponent {
   }
 
   fetchCommitDetails() {
-    this.giteaService.getChangedFileFromCommit(this.username, this.repoName, this.sha).subscribe(
-      (data: any) => {
+    this.giteaService.getChangedFileFromCommit(this.username, this.repoName, this.sha).subscribe({
+      next:(data) => {
         this.commitDetails = data;
         console.log('Commit Details:', this.commitDetails);
       },
-      (error:any) => {
+      error:(error) => {
         console.error('Error fetching commit details:', error);
       }
-    );
+  });
   }
 
 
@@ -384,109 +375,27 @@ export class AppComponent {
     });
   }
   
-  
-  // Update the selected file content
-  // updateFileContent(): void {
-  //   if (!this.selectedRepoName || !this.selectedBranch || !this.selectedFolderPath || !this.selectedFileName || !this.fileContent) {
-  //     console.error('Repository name, branch, folder path, file name, and content are required.');
-  //     return;
-  //   }
 
-  //   const filePathToUpdate = this.selectedFolderPath === '/' ? this.selectedFileName : `${this.selectedFolderPath}/${this.selectedFileName}`;
 
-  //   this.giteaService.updateFile(
-  //     this.username,
-  //     this.selectedRepoName,
-  //     filePathToUpdate,
-  //     this.fileContent,
-  //     this.selectedBranch
-  //   ).subscribe({
-  //     next: (response: any) => {
-  //       console.log('File updated successfully:', response);
-  //       // Handle success, if needed
-  //       // After updating, you can reload the folder contents to reflect changes
-  //       this.loadFolderContents();
-  //     },
-  //     error: (error: any) => {
-  //       console.error('Error updating file:', error);
-  //       // Handle error, if needed
-  //     }
-  //   });
-  // }
 
-  // Update the file content in the repository
-// Update the file content in the repository
-updateFileContent(): void {
-  // Check if any of the required parameters is missing
-  if (!this.selectedRepoName || !this.selectedBranch || !this.selectedFolderPath || !this.selectedFileName || !this.fileContent) {
-    console.error('Repository name, branch, folder path, file name, and content are required.');
-    return;
-  }
 
-  // Construct the file path based on the selected folder path
-  const filePathToUpdate = this.selectedFolderPath === '/' ? this.selectedFileName : `${this.selectedFolderPath}/${this.selectedFileName}`;
-
-  // Fetch the latest commit SHA for the selected branch
-  this.getLatestCommitSHA(this.username, this.selectedRepoName, this.selectedBranch).subscribe({
-    next: (commitSHA: string) => {
-
-      console.log("File")
-      if (!commitSHA) {
-        console.error('Latest commit SHA is undefined or empty.');
-        // Handle error or return, depending on your requirements
-        // return;
+updateFiles() {
+  this.giteaService.updateFiles(this.username, this.repoName, this.filePath, this.fileContent, this.branch, this.sha)
+    .subscribe(
+      (response) => {
+        console.log('File updated successfully:', response);
+        // Add any additional handling after successful update
+      },
+      (error) => {
+        console.error('Error updating file:', error);
+        // Handle error as needed
       }
-
-      console.log('Latest commit SHA:', commitSHA); // Log the commit SHA
-
-      // Update the file with the latest commit SHA included in the headers
-      const headers = new HttpHeaders({ 'If-Match': "920a569ae69d22c85c60ef8356cfccd035ef8355" });
-      
-      this.giteaService.updateFile(
-        this.username,
-        this.selectedRepoName,
-        filePathToUpdate, // Use the constructed file path
-        this.fileContent,
-        this.selectedBranch,
-        headers
-      ).subscribe({
-        next: (response: any) => {
-
-          console.log('File updated successfully:', response);
-          // Handle success, if needed
-          // After updating, you can reload the folder contents to reflect changes
-          this.loadFolderContents();
-        },
-        error: (error: any) => {
-          console.error('Error updating file:', error);
-          // Handle error, if needed
-        }
-      });
-    },
-    error: (error: any) => {
-      console.error('Error fetching latest commit SHA:', error);
-      // Handle error, if needed
-    }
-  });
+    );
 }
 
 
 
 
-
-getLatestCommitSHA(username: string, repoName: string, branchName: string): Observable<string> {
-  // Fetch branches for the repository
-  return this.giteaService.getBranches(username, repoName).pipe(
-    map((branches: any[]) => {
-      // Find the branch by name
-      const branch = branches.find(b => b.name === branchName);
-
-      // Return the latest commit SHA for the branch
-      return branch ? branch.commit.sha : '';
-    })
-  );
-}
-  
 
 
 deleteBranch(): void {
